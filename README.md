@@ -30,6 +30,14 @@ python3 train.py \
 
 这个配置文件里有个log路径，需要改一下
 
+TODO：
+
+- [ ] 把这个resnet152搬到Easy Pose的代码里，对比一下HRNet的
+- [ ] 在EasyPose里读他的dataset
+  - `easypose/dataset/top_down/top_down.py`, Line 238, 这里增加了一个type
+  - `easypose/datasest/bottom_up/bottom_up.py`, Line 140, 这里仿照`_load_info_from_easymocap`增加一个函数，只有保持内容一致就行
+
+
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/190505754/3d-human-pose-estimation-on-human36m)](https://paperswithcode.com/sota/3d-human-pose-estimation-on-human36m?p=190505754)
 
 # Learnable Triangulation of Human Pose
