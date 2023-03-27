@@ -15,7 +15,7 @@ opt:
   n_epochs: 9999
 
   batch_size: 5
-  val_batch_size: 75
+  val_batch_size: 32
 
   lr: 0.0001
   process_features_lr: 0.001
@@ -75,8 +75,8 @@ dataset:
     h36m_root: "./data/human36m/processed/"
     labels_path: "./data/human36m/extra/human36m-multiview-labels-GTbboxes.npy"
     pred_results_path: "./data/pretrained/human36m/human36m_alg_10-04-2019/checkpoints/0060/results/val.pkl"
-
-    with_damaged_actions: true
+    pred_results_path: "./logs/eval_human36m_alg_AlgebraicTriangulationNet@27.03.2023-14:50:45/checkpoints/0000/results.pkl"
+    with_damaged_actions: false
     undistort_images: true
 
     scale_bbox: 1.0

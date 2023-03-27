@@ -11,7 +11,7 @@ import copy
 
 import numpy as np
 import cv2
-
+from easymocap.mytools.torchtimer import TorchTimer
 import torch
 from torch import nn
 from torch import autograd
@@ -48,6 +48,7 @@ def parse_args():
 
 def setup_human36m_dataloaders(config, is_train, distributed_train):
     train_dataloader = None
+    train_sampler = None
     if is_train:
         # train
         train_dataset = human36m.Human36MMultiViewDataset(
@@ -163,7 +164,6 @@ def one_epoch(model, criterion, opt, config, dataloader, device, epoch, n_iters_
     metric_dict = defaultdict(list)
 
     results = defaultdict(list)
-
     # used to turn on/off gradients
     grad_context = torch.autograd.enable_grad if is_train else torch.no_grad
     with grad_context():
@@ -181,15 +181,15 @@ def one_epoch(model, criterion, opt, config, dataloader, device, epoch, n_iters_
                 if batch is None:
                     print("Found None batch")
                     continue
-
                 images_batch, keypoints_3d_gt, keypoints_3d_validity_gt, proj_matricies_batch = dataset_utils.prepare_batch(batch, device, config)
 
                 keypoints_2d_pred, cuboids_pred, base_points_pred = None, None, None
                 if model_type == "alg" or model_type == "ransac":
-                    keypoints_3d_pred, keypoints_2d_pred, heatmaps_pred, confidences_pred = model(images_batch, proj_matricies_batch, batch)
+                    with TorchTimer('forward'):
+                        keypoints_3d_pred, keypoints_2d_pred, heatmaps_pred, confidences_pred = model(images_batch, proj_matricies_batch, batch)
                 elif model_type == "vol":
-                    keypoints_3d_pred, heatmaps_pred, volumes_pred, confidences_pred, cuboids_pred, coord_volumes_pred, base_points_pred = model(images_batch, proj_matricies_batch, batch)
-
+                    with TorchTimer('forward'):
+                        keypoints_3d_pred, heatmaps_pred, volumes_pred, confidences_pred, cuboids_pred, coord_volumes_pred, base_points_pred = model(images_batch, proj_matricies_batch, batch)
                 batch_size, n_views, image_shape = images_batch.shape[0], images_batch.shape[1], tuple(images_batch.shape[3:])
                 n_joints = keypoints_3d_pred.shape[1]
 
@@ -269,7 +269,7 @@ def one_epoch(model, criterion, opt, config, dataloader, device, epoch, n_iters_
 
                 # plot visualization
                 if master:
-                    if n_iters_total % config.vis_freq == 0:# or total_l2.item() > 500.0:
+                    if n_iters_total % config.vis_freq == 0 and False:# or total_l2.item() > 500.0:
                         vis_kind = config.kind
                         if (config.transfer_cmu_to_human36m if hasattr(config, "transfer_cmu_to_human36m") else False):
                             vis_kind = "coco"
@@ -441,7 +441,7 @@ def main(args):
 
     # datasets
     print("Loading data...")
-    train_dataloader, val_dataloader, train_sampler = setup_dataloaders(config, distributed_train=is_distributed)
+    train_dataloader, val_dataloader, train_sampler = setup_dataloaders(config, is_train=False, distributed_train=is_distributed)
 
     # experiment
     experiment_dir, writer = None, None

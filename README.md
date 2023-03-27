@@ -1,3 +1,35 @@
+# 预处理
+
+```bash
+git clone https://github.com/anibali/h36m-fetch.git
+cd h36m-fetch
+python3 process_all.py
+cd ..
+cd mvn/datasets/human36m_preprocessing
+python3 collect-bboxes.py $THIS_REPOSITORY/data/human36m 32 # 多线程
+```
+
+
+# 测试：
+
+```bash
+python3 train.py \
+  --eval --eval_dataset val \
+  --config experiments/human36m/eval/human36m_alg.yaml \
+  --logdir ./logs
+```
+
+他需要这个东西的结果，获得root点的估计，所以要跑完这个才能跑vol的
+
+```bash
+python3 train.py \
+  --eval --eval_dataset val \
+  --config experiments/human36m/eval/human36m_vol_softmax.yaml \
+  --logdir ./logs
+```
+
+这个配置文件里有个log路径，需要改一下
+
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/190505754/3d-human-pose-estimation-on-human36m)](https://paperswithcode.com/sota/3d-human-pose-estimation-on-human36m?p=190505754)
 
 # Learnable Triangulation of Human Pose
