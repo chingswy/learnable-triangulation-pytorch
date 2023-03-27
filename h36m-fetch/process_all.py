@@ -35,7 +35,7 @@ def select_frame_indices_to_include(subject, poses_3d_univ):
     # Take every 64th frame for the protocol #2 test subjects
     # (see the "Compositional Human Pose Regression" paper)
     if subject == 'S9' or subject == 'S11':
-        return np.arange(0, len(poses_3d_univ), 64)
+        return np.arange(0, len(poses_3d_univ), 5)
 
     # Take only frames where movement has occurred for the protocol #2 train subjects
     frame_indices = []
