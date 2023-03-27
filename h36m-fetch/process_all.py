@@ -103,6 +103,9 @@ def process_view(out_dir, subject, action, subaction, camera):
     frame_indices = select_frame_indices_to_include(subject, poses_3d_univ)
     frames = frame_indices + 1
     video_file = path.join(subj_dir, 'Videos', base_filename + '.mp4')
+    # 判断一下视频名字
+    if 'S11' in subj_dir and base_filename == 'Directions.54138969':
+        return -1
     frames_dir = path.join(out_dir, 'imageSequence', camera)
     makedirs(frames_dir, exist_ok=True)
 
@@ -157,11 +160,12 @@ def process_subaction(subject, action, subaction):
     for camera in tqdm(metadata.camera_ids, ascii=True, leave=False):
         # try:
         annots = process_view(out_dir, subject, action, subaction, camera)
-        # except:
-        #     tqdm.write('!!! Error processing sequence, skipping: ' + \
-        #                repr((subject, action, subaction, camera)))
-        #     tqdm.write(traceback.format_exc())
-        #     continue
+        if annots == -1:
+            # except:
+            tqdm.write('!!! Error processing sequence, skipping: ' + \
+                        repr((subject, action, subaction, camera)))
+            tqdm.write(traceback.format_exc())
+            continue
         for k, v in annots.items():
             if k in datasets:
                 datasets[k].append(v)
