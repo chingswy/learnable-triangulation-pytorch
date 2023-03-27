@@ -32,6 +32,7 @@ python3 train.py \
 
 TODO：
 
+- [ ] 等待alg的跑完，看一眼alg的结果，然后再跑起来vol的
 - [ ] 把这个resnet152搬到Easy Pose的代码里，对比一下HRNet的
 - [ ] 在EasyPose里读他的dataset
   - `easypose/dataset/top_down/top_down.py`, Line 238, 这里增加了一个type

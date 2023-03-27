@@ -104,3 +104,7 @@ venv.bak/
 .mypy_cache/
 
 data
+logs
+h36m-fetch/h36m
+h36m-fetch/extra
+h36m-fetch/processed

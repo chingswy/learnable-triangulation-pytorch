@@ -10,9 +10,10 @@ import os, sys
 import numpy as np
 import h5py
 
-dataset_root = sys.argv[1]
+dataset_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'h36m-fetch'))
+# dataset_root = sys.argv[1]
 data_path = os.path.join(dataset_root, "processed")
-subjects = [x for x in os.listdir(data_path) if x.startswith('S')]
+subjects = sorted([x for x in os.listdir(data_path) if x.startswith('S')])
 assert len(subjects) == 7
 
 destination_dir = os.path.join(dataset_root, "extra")
@@ -49,13 +50,19 @@ def load_bboxes(data_path, subject, action, camera):
             corrected_action = action.replace('-', ' ')
 
         # TODO use pathlib
+        # bboxes_path = os.path.join(
+        #     data_path,
+        #     subject,
+        #     'MySegmentsMat',
+        #     'ground_truth_bb',
+        #     '%s.%s.mat' % (corrected_action, camera))
         bboxes_path = os.path.join(
-            data_path,
-            subject,
-            'MySegmentsMat',
-            'ground_truth_bb',
+            data_path.replace('processed', 'extracted'),
+            'masks',
+            '{}_MySegmentsMat'.format(subject),
+            'ground_truth_bs',
             '%s.%s.mat' % (corrected_action, camera))
-
+        assert os.path.exists(bboxes_path), bboxes_path
         with h5py.File(bboxes_path, 'r') as h5file:
             retval = np.empty((len(h5file['Masks']), 4), dtype=np.int32)
 
@@ -78,13 +85,14 @@ def add_result_to_retval(args):
     bboxes_retval[subject][action][camera] = bboxes
 
 import multiprocessing
-num_processes = int(sys.argv[2])
+# num_processes = int(sys.argv[2])
+num_processes = 32
 pool = multiprocessing.Pool(num_processes)
 async_errors = []
 
 for subject in subjects:
     subject_path = os.path.join(data_path, subject)
-    actions = os.listdir(subject_path)
+    actions = sorted(os.listdir(subject_path))
     try:
         actions.remove('MySegmentsMat') # folder with bbox *.mat files
     except ValueError:
