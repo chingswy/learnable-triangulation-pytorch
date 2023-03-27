@@ -9,6 +9,12 @@ cd mvn/datasets/human36m_preprocessing
 python3 collect-bboxes.py $THIS_REPOSITORY/data/human36m 32 # 多线程
 ```
 
+对图像畸变矫正：
+
+```bash
+python3 undistort-h36m.py $THIS_REPOSITORY/data/human36m $THIS_REPOSITORY/data/human36m/extra/human36m-multiview-labels-GTbboxes.npy 32
+```
+
 
 # 测试：
 
